@@ -1,0 +1,22 @@
+FROM python:3.10
+
+WORKDIR /scrapper
+
+COPY ./bot ./bot
+COPY ./config ./config
+COPY ./config ./config_link_maker/config
+COPY ./config_link_maker ./config_link_maker
+COPY ./config_link_maker ./config_link_maker/config_link_maker
+COPY ./scripts ./scripts
+COPY ./scrap_handlers ./scrap_handlers
+
+COPY requirements.txt .
+
+COPY main.py .
+
+RUN mkdir db
+RUN mkdir log
+
+RUN python3 -m pip install -r requirements.txt
+
+ENTRYPOINT ["python3", "config_link_maker/main_link_maker.py"]

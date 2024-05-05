@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  scrapper:
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+    restart: on-failure
+    volumes:
+      - /tmp/scrap/db:/scrapper/db
+      - /tmp/scrap/log:/scrapper/log
+    environment:
+      - TIMEOUT=300
+      - EXCLUDE=${EXCLUDE:-['Варочная панель']}
+      - PROJECT_PATH=/scrapper
+      - ALLOW_ASYNC=1
+
+  bot:
+    build:
+      dockerfile: docker/Dockerfile.bot
+      context: ..
+    restart: on-failure
+    volumes:
+      - /tmp/scrap/db:/scrapper/db
+      - /tmp/scrap/log:/scrapper/log
+    environment:
+      - TIMEOUT=300
+      - EXCLUDE=${EXCLUDE:-['Варочная панель']}
+      - PROJECT_PATH=/scrapper
+      - ALLOW_ASYNC=1
+    depends_on:
+      - link_maker
+
+  link_maker:
+    build:
+      dockerfile: docker/Dockerfile.link_maker
+      context: ..
+    restart: on-failure
+    volumes:
+      - /tmp/scrap/db:/scrapper/db
+      - /tmp/scrap/log:/scrapper/log
+    environment:
+      - TIMEOUT=300
+      - EXCLUDE=${EXCLUDE:-['Варочная панель']}
+      - PROJECT_PATH=/scrapper
+      - ALLOW_ASYNC=1
+    depends_on:
+      - scrapper
